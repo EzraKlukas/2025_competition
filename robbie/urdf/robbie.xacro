@@ -6,6 +6,19 @@
   <xacro:property name="camera_length" value="0.02"/>
   <xacro:property name="camera_height" value="0.01"/>
   <xacro:property name="camera_mass" value="0.01"/>
+
+  <!-- Inserting two cameras right and left -->
+
+  <xacro:property name="lcam_width" value="0.02"/>
+  <xacro:property name="lcam_length" value="0.02"/>
+  <xacro:property name="lcam_height" value="0.01"/>
+  <xacro:property name="lcam_mass" value="0.01"/>
+
+  <xacro:property name="rcam_width" value="0.02"/>
+  <xacro:property name="rcam_length" value="0.02"/>
+  <xacro:property name="rcam_height" value="0.01"/>
+  <xacro:property name="rcam_mass" value="0.01"/>
+
   <xacro:property name="chassis_width" value="0.15"/>
   <xacro:property name="chassis_length" value="0.2"/>
   <xacro:property name="chassis_height" value="0.05"/>
@@ -114,6 +127,36 @@
     </visual>
   </link>
 
+  <link name='lcam_link'>
+    <xacro:box_inertial name="lcam_link" m="${camera_mass}" x="${camera_width}" y="${camera_length}" z="${camera_height}"/>
+    <collision name='lcam_link_collision'>
+      <geometry>
+        <box size="${camera_length} ${camera_width} ${camera_height}"/>
+      </geometry>
+    </collision>
+    <visual name='lcam_link_visual'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="${camera_length} ${camera_width} ${camera_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name='rcam_link'>
+    <xacro:box_inertial name="rcam_link" m="${camera_mass}" x="${camera_width}" y="${camera_length}" z="${camera_height}"/>
+    <collision name='rcam_link_collision'>
+      <geometry>
+        <box size="${camera_length} ${camera_width} ${camera_height}"/>
+      </geometry>
+    </collision>
+    <visual name='rcam_link_visual'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="${camera_length} ${camera_width} ${camera_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
   <joint name="wheel_FR_joint" type="continuous">
     <parent link="chassis"/>
     <child link="wheel_FR"/>
@@ -152,6 +195,19 @@
     <origin xyz="${chassis_length/2} 0 ${chassis_height/2+camera_height/2}"/>
   </joint>
 
+
+  <joint name="lcam_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="lcam_link"/>
+    <origin xyz="${chassis_length/2} ${chassis_width/4} ${chassis_height/2+lcam_height/2}" rpy="0 0 0.785398"/>
+  </joint>
+
+  <joint name="rcam_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="rcam_link"/>
+    <origin xyz="${chassis_length/2} ${-chassis_width/4} ${chassis_height/2+rcam_height/2}" rpy="0 0 -0.785398"/>
+  </joint>
+
   <gazebo reference="chassis">
     <material>Gazebo/Orange</material>
   </gazebo>
@@ -159,7 +215,15 @@
   <gazebo reference="camera_link">
     <material>Gazebo/Blue</material>
   </gazebo>
-
+  
+  <gazebo reference="lcam_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+  <gazebo reference="rcam_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
   <gazebo reference="wheel_FL">
     <material>Gazebo/Yellow</material>
   </gazebo>
@@ -232,5 +296,84 @@
     </sensor>
   </gazebo>
 
+  <gazebo reference="lcam_link">
+    <sensor type="camera" name="lcam">
+      <update_rate>5.0</update_rate>
+      <camera name="left">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+              That pixel's noise value is added to each of its color
+              channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="lcam_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>rrbot/lcam</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>lcam_info</cameraInfoTopicName>
+        <frameName>lcam_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+  
+  <gazebo reference="rcam_link">
+    <sensor type="camera" name="rcam">
+      <update_rate>5.0</update_rate>
+      <camera name="right">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+              That pixel's noise value is added to each of its color
+              channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="rcam_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>rrbot/rcam</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>rcam_info</cameraInfoTopicName>
+        <frameName>rcam_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
 
 </robot>

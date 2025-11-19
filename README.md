@@ -34,6 +34,7 @@ catkin_make
 
 * Source the environment
 ```
+
 source devel/setup.bash
 ```
 
