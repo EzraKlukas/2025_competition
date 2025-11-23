@@ -22,6 +22,8 @@ def loadCrimesProfileCompetition():
                  place:value,motive:value,
                  weapon:value,bandit:value]
     '''
+
+    '''
     URL = "https://phas.ubc.ca/~miti/ENPH353/ENPH353Clues.csv"
 
     print("Loading clues ...")
@@ -30,25 +32,42 @@ def loadCrimesProfileCompetition():
     raw = response.text.split('\n')
     key_list   = raw[0].split(',')
     value_list = raw[1].split(',')
+    '''    
 
     clues = {}
+
+    def gen_ran_cap_word(length):
+        word = ""
+
+        for character in range(length):
+            word += random.choice(string.ascii_uppercase)
+
+        return word
+
+    for plate in range(NUM_PLATES):
+        key = gen_ran_cap_word(KEY_LEN)
+        val = gen_ran_cap_word(VALUE_LEN)
+        
+        clues[key] = val
 
     # We will save the clues to plates.csv
     # TODO Rename plates.csv to clues.csv
     with open(SCRIPT_PATH + "plates.csv", 'w') as plates_file:
         csvwriter = csv.writer(plates_file)
 
-        for (key, value) in zip(key_list, value_list):
-            clues[key] = value.upper()
-
+        for (key, value) in clues.items():
             # save it to plates
-            csvwriter.writerow([key, value.upper()])
+            csvwriter.writerow([key, value])
 
     return clues
 
 # Find the path to this script
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__)) + "/"
 TEXTURE_PATH = '../media/materials/textures/'
+
+KEY_LEN = 6
+VALUE_LEN = 12
+NUM_PLATES = 8
 
 banner_canvas = cv2.imread(SCRIPT_PATH+'clue_banner.png')
 PLATE_HEIGHT = 600

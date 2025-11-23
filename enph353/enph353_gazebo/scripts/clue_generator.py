@@ -1,22 +1,20 @@
-
 import requests
-
 from openai import OpenAI
 
 def generateClues():
-    '''
-    '''
 
     URL = "https://phas.ubc.ca/~miti/ENPH353/ENPH353Keys.txt"
-
     response = requests.get(URL)
-    API_KEY,_ = response.text.split(',')
 
-    client = OpenAI(
-            api_key=API_KEY
-        )
+    # Inspect the result
+    print("Server returned:", repr(response.text))
 
-    prompt = f"""You will generate clues that describe a potential funny crime 
+    # Probably only contains the API key
+    API_KEY = response.text.strip()
+
+    client = OpenAI(api_key=API_KEY)
+
+    prompt = """You will generate clues that describe a potential funny crime 
                 for your game in random order. 
                 The clues must have less than 13 characters. 
                 Use themes from planet Earth.
@@ -32,22 +30,14 @@ def generateClues():
                 """
 
     completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4.1-mini",
         messages=[
-            {"role": "system", "content": f"""You are a game creator making a 
-             fun game similar to the boardgame Clue. You want the game to be
-             different than the game of Clue so you make changes to it. Your
-             game's victim has a funny name related to events from today. 
-             This name can be common noun so don't use only proper nouns. 
-             The criminals are also different than the original game of Clue 
-             and they also make one smile. The location is not limited to 
-             human scale, it can be anywhere in the universe from galaxies 
-             to atomic nuclei. And the weapon needs to be a fun one too."""},
+            {"role": "system", "content": "You are a game creator..."},
             {"role": "user", "content": prompt}
-        ])
+        ]
+    )
 
     story = completion.choices[0].message.content
     print(story)
 
 generateClues()
-exit(0)
