@@ -2,7 +2,7 @@
 
 spawn_vehicles='false'
 spawn_pedestrians='false'
-generate_plates='false'
+generate_plates='true'
 label_plates='false'
 wind_blowing='false'
 
@@ -41,17 +41,17 @@ if $generate_plates = 'true'
 then
   echo "Generating new plates."
 	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-	RELATIVE_PATH="/../../enph353_gazebo/scripts/plate_generator.py"
-	FULL_PATH=".$RELATIVE_PATH"
+	RELATIVE_PATH="../../enph353_gazebo/scripts/plate_generator.py"
+	FULL_PATH="$DIR/$RELATIVE_PATH"
 	python3 $FULL_PATH
 fi
 
 # display plates with or without QR code
 if $label_plates = 'true'
 then
-  ln -sfn labelled ../../enph353_gazebo/media/materials/textures/license_plates
+  ln -sfn labelled /home/fizzer/ros_ws/src/2025_competition/enph353/enph353_gazebo/media/materials/textures/license_plates
 else
-  ln -sfn unlabelled ../../enph353_gazebo/media/materials/textures/license_plates
+  ln -sfn unlabelled /home/fizzer/ros_ws/src/2025_competition/enph353/enph353_gazebo/media/materials/textures/license_plates
 fi
 
 # start the ROS environment

@@ -34,18 +34,25 @@ def loadCrimesProfileCompetition():
     value_list = raw[1].split(',')
     '''    
 
+    clue_topic = ['SIZE', 'VICTIM', 'CRIME', 'TIME', 'PLACE', 'MOTIVE', 'WEAPON', 'BANDIT']
     clues = {}
 
     def gen_ran_cap_word(length):
         word = ""
+        CHARS_INCL_SPACE = POSS_CHARS.copy()
+        CHARS_INCL_SPACE.append(" ")
 
         for character in range(length):
-            word += random.choice(string.ascii_uppercase)
+            if character != 0 and character != length-1 and word[character-1] != " ":
+                word += random.choice(CHARS_INCL_SPACE)
+            else:
+                word += random.choice(POSS_CHARS)
 
         return word
 
     for plate in range(NUM_PLATES):
-        key = gen_ran_cap_word(KEY_LEN)
+        key = clue_topic[plate]
+        # key = gen_ran_cap_word(KEY_LEN) # THIS IS FOR DATA THE CNN DATA GENERATION!
         val = gen_ran_cap_word(VALUE_LEN)
         
         clues[key] = val
@@ -68,6 +75,11 @@ TEXTURE_PATH = '../media/materials/textures/'
 KEY_LEN = 6
 VALUE_LEN = 12
 NUM_PLATES = 8
+POSS_CHARS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 
+              'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 
+              'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6',
+              '7', '8', '9'
+              ]
 
 banner_canvas = cv2.imread(SCRIPT_PATH+'clue_banner.png')
 PLATE_HEIGHT = 600
